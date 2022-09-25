@@ -6,7 +6,22 @@
     ViewBag.Title = "Details";
 
     List<Order> CustomerOrders = 
-        Model.Orders.OrderByDescending(o => o.OrderDate).Take(5).ToList();
+        Model.Orders.
+        Select(Order => Order). // A list of orders
+        OrderByDescending(o => o.OrderDate).
+        Take(5).
+        
+        ToList();
+
+    List<string> CustomerProducts = 
+        Model. // customer
+        Orders. // list of order
+        SelectMany(o => o.Order_Details). // each order == #OD ~ List of Order_details o:  Order
+        Select(od => od.Product.ProductName). // od: Order_Detail -List of /strings
+        Distinct(). // remove the duplicates
+        OrderBy(c => c). // Sort strings - Alphabetical sort
+        Take(5).
+        ToList();
 
 }
 
@@ -107,6 +122,15 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="list-group container">
+                        @foreach(var item in CustomerProducts.Take(5))
+            {
+                <div class="list-group-item">
+                    @item
+                </div>
+            }
+
+                <div class="card-body">
                     Information about products recently purchased goes here.
                 </div>
                 <div class="card-footer text-center" style="background-color: beige">
@@ -115,7 +139,8 @@
             </div>
 
         </div>
-
+</div>
+            </div>
 
 
         <div class="navbar ">

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using NWTradersWeb.Models;
+using PagedList;
 
 namespace NWTradersWeb.Controllers
 {
@@ -14,11 +16,62 @@ namespace NWTradersWeb.Controllers
     {
         private NorthwindEntities db = new NorthwindEntities();
 
-        // GET: Products
+        /*// GET: Products
         public ActionResult Index()
         {
             var products = db.Products.Include(p => p.Category).Include(p => p.Supplier);
             return View(products.ToList());
+        }*/
+
+       // GET: Products
+        public ActionResult Index(
+            int? page, // which page # in the list of pages that the list of Customers is displayed with
+            string searchProductName = "", // if searchProductName is provided, we ARE searching by Product.
+            string searchProductCategory = "", // if searchCategory is provided, we ARE searching by Category.
+            bool discontinued = false // Dont show discounted by default
+            )
+        {
+
+            // begin by getting all the customers from the db
+            IEnumerable<Product> theProducts = db.Products.
+                OrderBy(c => c.ProductName).
+                Select(c => c).ToList();
+
+            if (!discontinued)
+                theProducts = theProducts.
+                    Where(c => c.Discontinued == false);
+            ViewBag.discontinued = discontinued;
+
+            ViewBag.searchProductName = searchProductName;
+            if (theProducts.Count() > 0)
+                // Here the ignore case allows for searches that are not case sensitive.
+                // Use this to do case insensitive searches for any field.
+                if (string.IsNullOrEmpty(searchProductName) == false)
+                {
+                    // Here the ignore case allows for searches that are not case sensitive.
+                    // Use this to do case insensitive searches for any field.
+                    theProducts = theProducts.
+                        Where(c => c.ProductName.StartsWith(searchProductName, ignoreCase: true, new System.Globalization.CultureInfo("en-US"))).
+                        OrderBy(c => c.ProductName).
+                        Select(c => c);
+                }
+
+            ViewBag.searchProductCategory = searchProductCategory;
+            if (theProducts.Count() > 0)
+                // Here the ignore case allows for searches that are not case sensitive.
+                // Use this to do case insensitive searches for any field.
+                if (string.IsNullOrEmpty(searchProductCategory) == false)
+                {
+                    // Here the ignore case allows for searches that are not case sensitive.
+                    // Use this to do case insensitive searches for any field.
+                    theProducts = theProducts.
+                        Where(c => c.Category.Description.StartsWith(searchProductCategory, ignoreCase: true, new System.Globalization.CultureInfo("en-US"))).
+                        OrderBy(c => c.Category.Description).
+                        Select(c => c);
+                }
+
+            return View(theProducts.ToList());
+
         }
 
         // GET: Products/Details/5

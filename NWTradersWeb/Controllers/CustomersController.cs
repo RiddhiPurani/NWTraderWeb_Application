@@ -4,6 +4,7 @@
  * Most commonly, the usings are the 
  */
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -64,7 +65,7 @@ namespace NWTradersWeb.Controllers
         /// <param name="sortOrder"></param>
         /// <param name="searchCompanyName"></param>
         /// <param name="searchCountryName"></param>
-        /// <param name="searchTitle"></param>
+        /// <param name="searchTitl"></param>
         /// <returns></returns>
         public ActionResult Index(
             int? page, // which page # in the list of pages that the list of Customers is displayed with
@@ -72,6 +73,9 @@ namespace NWTradersWeb.Controllers
             string sortOrder = "", // A sortby field - empty (by default ) - means that a default sort order is applied.
             string searchCompanyName = "", // if searchCompany name is not provided, we are NOT searching by CompanyName.
             string searchCountryName = "", // if searchCountry is provided, we ARE searching by Country Name.
+            string searchContactName = "", // if searchContact is provided, we ARE searching by Contact Name.
+            string searchCity = "", // if searchCity is provided, we ARE searching by City.
+            string searchRegion = "", // if searchRegion is provided, we ARE searching by Region.
             string searchTitle = "")
         {
 
@@ -95,6 +99,49 @@ namespace NWTradersWeb.Controllers
                 }
             ViewBag.searchCompanyName = searchCompanyName;
 
+            ViewBag.searchContactName = searchContactName;
+            if (theCustomers.Count() > 0)
+                // Here the ignore case allows for searches that are not case sensitive.
+                // Use this to do case insensitive searches for any field.
+                if (string.IsNullOrEmpty(searchContactName) == false)
+                {
+                    // Here the ignore case allows for searches that are not case sensitive.
+                    // Use this to do case insensitive searches for any field.
+                    theCustomers = theCustomers.
+                        Where(c => c.ContactName.StartsWith(searchContactName, ignoreCase: true, new System.Globalization.CultureInfo("en-US"))).
+                        OrderBy(c => c.ContactName).
+                        Select(c => c);
+                }
+
+            
+            ViewBag.searchCity = searchCity;
+            if (theCustomers.Count() > 0)
+                // Here the ignore case allows for searches that are not case sensitive.
+                // Use this to do case insensitive searches for any field.
+                if (string.IsNullOrEmpty(searchCity) == false)
+                {
+                    // Here the ignore case allows for searches that are not case sensitive.
+                    // Use this to do case insensitive searches for any field.
+                    theCustomers = theCustomers.
+                        Where(c => c.City.StartsWith(searchCity, ignoreCase: true, new System.Globalization.CultureInfo("en-US"))).
+                        OrderBy(c => c.City).
+                        Select(c => c);
+                }
+
+            ViewBag.searchRegion = searchRegion;
+            if (theCustomers.Count() > 0)
+                // Here the ignore case allows for searches that are not case sensitive.
+                // Use this to do case insensitive searches for any field.
+                if (string.IsNullOrEmpty(searchRegion) == false)
+                {   
+                    // Here the ignore case allows for searches that are not case sensitive.
+                    // Use this to do case insensitive searches for any field.
+                    theCustomers = theCustomers.
+                        Where(c => string.IsNullOrEmpty(c.Region) == false).
+                        Where(c => c.Region.Equals(searchRegion)).
+                        OrderBy(c => c.Region).
+                        Select(c => c);
+                }
 
             if (theCustomers.Count() > 0)
                 if (string.IsNullOrEmpty(searchCountryName) == false)
