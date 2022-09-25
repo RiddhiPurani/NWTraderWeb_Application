@@ -1,67 +1,13 @@
-﻿@*@model IEnumerable<NWTradersWeb.Models.Product>
-
-    @{
-        ViewBag.Title = "Index";
-    }
-
-    <h2>Index</h2>*@
-
-<!--my code-->
-@using NWTradersWeb.Models;
+﻿@using NWTradersWeb.Models;
 @using PagedList.Mvc;
 @using PagedList;
+@model List<Product>
 
-@model IPagedList<NWTradersWeb.Models.Product>
 
 @{
-
-    // A viewbag is used to carry information (other than the model) from the controller function to a page.
-    // You essentially put informaiton into the view bag in the controller and it is available to collect or use in the page.
-    ViewBag.Title = "Products of NW Traders";
-
-    // Page Sizing - The paged list gives you a property that counts the TOTAL number of items in the list.
-    int NumberOfProducts = Model.TotalItemCount;
-
-    List<string> itemsPerPage = NWTradersUtilities.itemsPerPage;
-
-    // Here we use the viewbag to remember the values of our paging variables.
-    // The values were written to in the index function in the controller and are read from here to get the first and last pages.
-
-    // First is the first customer to be displayed ..
-    // for example customer # 16 in you are on the second page of a 15 customers per page list.
-    int? First = (ViewBag.pageNumber - 1) * ViewBag.pageSize + 1;
-
-    // Last is the last customer to display ...
-    // continuing the example ... customer # 30 on the second page of a 15 customers/per page list
-    int? Last = ViewBag.pageNumber * ViewBag.pageSize;
-
-    //if Last == 30 and there are only 23 customers, then Last must become 23.
-    Last = (Last > NumberOfProducts) ? NumberOfProducts : Last;
-
-    // Get the list of countries from utilities
-    //List<string> productname = NWTradersUtilities.AllProductName().ToList();
-    //productname.Insert(0, ""); // Add an empty string to represent All - you could also use the word all here.
-
-    // Get the list of regions from utilities
-    List<string> productCategory = NWTradersUtilities.AllProductCategory().ToList();
-    productCategory.Insert(0, ""); // Add an empty string to represent All - you could also use the word all here.
-
-
-    // The "aCustomer" is just a "dummy" Customer ,
-    // We create it so we can use the "DisplayNameFor" helper to display our titles etc.
-    //
-    // We may abandon this practice as we progress, since we will need greater customization.
-    // As with many default options, you get standardization but lose some level of customizability.
-    //
-    // It is useful to know since you can use properties from the class
-    // Also, this is the default manner that Scaffolding (Automatic Generation of pages) works.
-    // Another benefit is that it chooses the type of display based on the data type
-    // so you dont have to worry about what type of input or output container to display your values in.
-
+    ViewBag.Title = "NWTrader Products";
     Product aProduct = Model.FirstOrDefault();
-
     bool disc = ViewBag.discontinued;
-
 }
 
 
@@ -70,141 +16,301 @@
     <div> &nbsp;</div>
     @Html.AntiForgeryToken()
 
-    <div class="h6">Search Products </div>
+    <div class="navbar p-2 shadow rounded-lg" style="">
+        <div class="navbar">
+            <div class="h6">Search Products </div>
+
+            &nbsp; &nbsp;
+            <div class="input-group-sm  ">
+                Product Name
+                @Html.TextBox("searchProductName", // Name of the variable that is passed to the controller - typically the same as "name" below.
+                        @ViewBag.searchProductName as string, // the variable that is displayed.
+                 new
+                 { // these are HTML properties used to manage the display of the text box.
+                     @class = "form-control",
+                     @type = "text",
+                     @name = "searchProductName",
+                     @placeholder = "Search by Product Name",
+                     onchange = "this.form.submit();",
+                     value = ViewBag.currentSearchProductName
+                 })
+            </div>
+            &nbsp; &nbsp;
+            <div class="input-group-sm  ">
+                Product Category
+                @Html.TextBox("searchProductCategory", // Name of the variable that is passed to the controller - typically the same as "name" below.
+                        @ViewBag.searchProductCategory as string, // the variable that is displayed.
+                 new
+                 { // these are HTML properties used to manage the display of the text box.
+                     @class = "form-control",
+                     @type = "text",
+                     @name = "searchProductCategory",
+                     @placeholder = "Search by Product Category",
+                     onchange = "this.form.submit();",
+                     value = ViewBag.currentsearchProductCategory
+                 })
+            </div>
+            &nbsp;&nbsp;
+            <div class="input-group-sm text-center">
+                show <span class="badge badge-warning">"Discontinued"</span>
+
+                @Html.CheckBox("discontinued", disc,
+                new
+                {
+                    @class = "w3-check",
+                    @type = "checkbox",
+                    onchange = "this.form.submit();",
+                })
+            </div>
+        </div>
+    </div>
+
+
 }
 
-
-<div class="input-group-sm  ">
-    Product Name
-    @Html.TextBox("searchProductName", // Name of the variable that is passed to the controller - typically the same as "name" below.
-            @ViewBag.searchProductName as string, // the variable that is displayed.
-     new
-     { // these are HTML properties used to manage the display of the text box.
-         @class = "form-control",
-         @type = "text",
-         @name = "searchProductName",
-         @placeholder = "Search by Product Name",
-         onchange = "this.form.submit();",
-         value = ViewBag.currentSearchProductName
-     })
-</div>
-<div class="input-group-sm  ">
-    Product Category
-    @Html.TextBox("searchProductCategory", // Name of the variable that is passed to the controller - typically the same as "name" below.
-            @ViewBag.searchProductCategory as string, // the variable that is displayed.
-     new
-     { // these are HTML properties used to manage the display of the text box.
-         @class = "form-control",
-         @type = "text",
-         @name = "searchProductCategory",
-         @placeholder = "Search by Product Category",
-         onchange = "this.form.submit();",
-         value = ViewBag.currentsearchProductCategory
-     })
-
-</div>
-
-&nbsp;&nbsp;
-<div class="input-group-sm text-center">
-    show <span class="badge badge-warning">"Discontinued"</span>
-    <br/>
-    @Html.CheckBox("discontinued", disc,
-    new
-    {
-        @class = "w3-check",
-        @type = "checkbox",
-        onchange = "this.form.submit();",
-    })
-</div>
-
-
-<!--End my code-->
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
-    <tr>
 
-        <th>
-            @Html.DisplayNameFor(model => aProduct.ProductName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.QuantityPerUnit)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.UnitPrice)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.UnitsInStock)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.UnitsOnOrder)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.ReorderLevel)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.Discontinued)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.Category.CategoryName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => aProduct.Supplier.CompanyName)
-        </th>
-        <th></th>
-
-    </tr>
-
-    @foreach (var item in Model)
-    {
+<div class="container shadow py-4">
+    <table  class="table-bordered table-striped" style="font-size:small; width:100%">
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.QuantityPerUnit)
-            </td>
-            <td class="px-2 text-right">
-                @item.UnitPrice.Value.ToString("c")
-            </td>   
-            <td>
-                @Html.DisplayFor(modelItem => item.UnitsInStock)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnitsOnOrder)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReorderLevel)
-            </td>
-            @if (item.Discontinued)
-            {
-                <td class="px-2 text-lg-center disabled font-weight-bold" style="color:mediumvioletred;">
-                    Discontinued
-                </td>
-            }
-            else
-            { 
-                <td class="px-2 text-lg-center font-weight-bold" style="color:forestgreen;">
-                    Available
-                </td>
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.Discontinued)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Supplier.CompanyName)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.ProductID }) |
-                @Html.ActionLink("Details", "Details", new { id = item.ProductID }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.ProductID })
-            </td>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.QuantityPerUnit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.UnitPrice)
+            </th>
+            <th>@Html.DisplayNameFor(model => aProduct.UnitsInStock)</th>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.UnitsOnOrder)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.ReorderLevel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.Discontinued)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.Category.CategoryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => aProduct.Supplier.CompanyName)
+            </th>
+            <th></th>
+
         </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuantityPerUnit)
+                </td>
+                <td class="px-2 text-right">
+                    @item.UnitPrice.Value.ToString("c")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnitsInStock)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnitsOnOrder)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReorderLevel)
+                </td>
+                @if (item.Discontinued)
+                {
+                    <td class="px-2 text-lg-center disabled font-weight-bold" style="color:mediumvioletred;">
+                        Discontinued
+                    </td>
+                }
+                else
+                {
+                    <td class="px-2 text-lg-center font-weight-bold" style="color:forestgreen;">
+                        Available
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.Discontinued)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Supplier.CompanyName)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.ProductID }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.ProductID }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.ProductID })
+                </td>
+            </tr>
+        }
+    </table>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!--my code-->
+<!--@using NWTradersWeb.Models;
+@using PagedList.Mvc;
+@using PagedList;-->
+@*@model IPagedList<NWTradersWeb.Models.Product>*@
+
+@*@{
+
+        // A viewbag is used to carry information (other than the model) from the controller function to a page.
+        // You essentially put informaiton into the view bag in the controller and it is available to collect or use in the page.
+        ViewBag.Title = "Products of NW Traders";
+
+        // Page Sizing - The paged list gives you a property that counts the TOTAL number of items in the list.
+        int NumberOfProducts = Model.TotalItemCount;
+
+        List<string> itemsPerPage = NWTradersUtilities.itemsPerPage;
+
+        // Here we use the viewbag to remember the values of our paging variables.
+        // The values were written to in the index function in the controller and are read from here to get the first and last pages.
+
+        // First is the first customer to be displayed ..
+        // for example customer # 16 in you are on the second page of a 15 customers per page list.
+        int? First = (ViewBag.pageNumber - 1) * ViewBag.pageSize + 1;
+
+        // Last is the last customer to display ...
+        // continuing the example ... customer # 30 on the second page of a 15 customers/per page list
+        int? Last = ViewBag.pageNumber * ViewBag.pageSize;
+
+        //if Last == 30 and there are only 23 customers, then Last must become 23.
+        Last = (Last > NumberOfProducts) ? NumberOfProducts : Last;
+
+        // Get the list of countries from utilities
+        //List<string> productname = NWTradersUtilities.AllProductName().ToList();
+        //productname.Insert(0, ""); // Add an empty string to represent All - you could also use the word all here.
+
+        // Get the list of regions from utilities
+        List<string> productCategory = NWTradersUtilities.AllProductCategory().ToList();
+        productCategory.Insert(0, ""); // Add an empty string to represent All - you could also use the word all here.
+
+
+        // The "aCustomer" is just a "dummy" Customer ,
+        // We create it so we can use the "DisplayNameFor" helper to display our titles etc.
+        //
+        // We may abandon this practice as we progress, since we will need greater customization.
+        // As with many default options, you get standardization but lose some level of customizability.
+        //
+        // It is useful to know since you can use properties from the class
+        // Also, this is the default manner that Scaffolding (Automatic Generation of pages) works.
+        // Another benefit is that it chooses the type of display based on the data type
+        // so you dont have to worry about what type of input or output container to display your values in.
+
+        Product aProduct = Model.FirstOrDefault();
+
+        bool disc = ViewBag.discontinued;
+
+    }*@
+
+
+@*@using (Html.BeginForm())
+    {// The form begins and ends on the with the curly braces.
+        <div> &nbsp;</div>
+        @Html.AntiForgeryToken()
+
+        <div class="h6">Search Products </div>
     }
 
-</table>
+
+    <div class="input-group-sm  ">
+        Product Name
+        @Html.TextBox("searchProductName", // Name of the variable that is passed to the controller - typically the same as "name" below.
+                @ViewBag.searchProductName as string, // the variable that is displayed.
+         new
+         { // these are HTML properties used to manage the display of the text box.
+             @class = "form-control",
+             @type = "text",
+             @name = "searchProductName",
+             @placeholder = "Search by Product Name",
+             onchange = "this.form.submit();",
+             value = ViewBag.currentSearchProductName
+         })
+    </div>
+    <div class="input-group-sm  ">
+        Product Category
+        @Html.TextBox("searchProductCategory", // Name of the variable that is passed to the controller - typically the same as "name" below.
+                @ViewBag.searchProductCategory as string, // the variable that is displayed.
+         new
+         { // these are HTML properties used to manage the display of the text box.
+             @class = "form-control",
+             @type = "text",
+             @name = "searchProductCategory",
+             @placeholder = "Search by Product Category",
+             onchange = "this.form.submit();",
+             value = ViewBag.currentsearchProductCategory
+         })
+
+    </div>
+
+    &nbsp;&nbsp;
+    <div class="input-group-sm text-center">
+        show <span class="badge badge-warning">"Discontinued"</span>
+        <br />
+        @Html.CheckBox("discontinued", disc,
+        new
+        {
+            @class = "w3-check",
+            @type = "checkbox",
+            onchange = "this.form.submit();",
+        })
+    </div>-->*@
+
+
+<!--End my code-->
